@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import random
 
 # Third-party dependencies
@@ -8,7 +7,12 @@ from PIL import ImageDraw
 
 from config import *
 
-def parse_text(quote, draw, font):
+def parse_text(quote):
+    # declare PIL objects
+    img=Image.new("RGBA", (CANVAS_WIDTH,CANVAS_HEIGHT),BG_COLOR)
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype(FONT_NAME[0],FONT_SIZE)
+
     lines = []
     line = ''
 
@@ -25,33 +29,42 @@ def parse_text(quote, draw, font):
 
     lines.append(line) # add last line
 
-    return lines
+    return lines, font, draw, img
 
-def text2img(quote, author):
-
-    # IMG SETTINGS (COLOR/FONT)
-    FONT = FONT_NAME[random.randint(0,len(FONT_NAME))-1] # pick random font
+if __name__=='__main__':
+    tweet = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " \
+           "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. " \
+           "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. " \
+           "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." \
+            " #Lorem #ipsum #tweetpic"
 
     c = random.randint(0,len(COLOR_SCHEME)-1)
+
     BG_COLOR = COLOR_SCHEME[c]["bg"]
     FONT_COLOR = COLOR_SCHEME[c]["font_color"]
 
-    # declare PIL objects
-    font = ImageFont.truetype(FONT,FONT_SIZE)
-    img=Image.new("RGBA", (CANVAS_WIDTH,CANVAS_HEIGHT),BG_COLOR)
-    draw = ImageDraw.Draw(img)
+    done = False
 
-    lines = parse_text(quote, draw, font)
+    while(not done):
+        lines, font, draw, img = parse_text(tweet)
+        line_height = draw.textsize("T",font)[1] + draw.textsize("T",font)[1]/3 # dummy char T + in line buffer
+        num_lines = len(lines)
+        txt_height = line_height*num_lines
 
-    line_height = draw.textsize("T",font)[1] # use dummy char T to find line height
+        if txt_height > MAX_HEIGHT: # too tall
+            FONT_SIZE-=1
+        else:
+            Y=CANVAS_HEIGHT/2-txt_height/2 # center it
+            done = True
+
 
     # Create the img
-    for num_lines in range(len(lines)):
-        draw.text((20, START_HEIGHT+line_height*num_lines),lines[num_lines],FONT_COLOR,font=font)
+    for c in range(num_lines):
+        x = X
+        y = Y+line_height*c
 
-    draw.text((20, START_HEIGHT+line_height*len(lines)+line_height),'-'+author,FONT_COLOR,font=font)
+        text = lines[c]
 
-    img.save("quote_img.png")
+        draw.text((x, y),text, FONT_COLOR, font=font)
 
-if __name__=='__main__':
-    text2img('He sells seashells down by the seashore','Albert Einstein')
+    img.save("tweet_img.png")
