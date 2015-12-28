@@ -1,12 +1,16 @@
 #!/usr/bin/python
 
-# text2img Text Config Settings
+# Canvas Settings
 CANVAS_HEIGHT=500
 CANVAS_WIDTH=500
 MAX_HEIGHT=400
-MAX_WIDTH=435
+MAX_WIDTH=400
+
+# Text Settings
 FONT_SIZE=40
-START_HEIGHT=100
+
+X=50 # starting X
+Y=50 # starting Y
 
 FONT_NAME= ["./fonts/arial.ttf",
             "./fonts/ACaslonPro-Italic.otf",
